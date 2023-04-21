@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  back:
+    build:
+      context: ./
+      dockerfile: ./backend/Dockerfile
+      target: production
+    command: ts-node dist/index.js
+    ports:
+      - "5000:5000"
+    restart: always

@@ -1,0 +1,58 @@
+name: "build & deploy to PROD server"
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-on-prod-server:
+    runs-on: ubuntu-22.04
+    container:
+      image: ubuntu:22.04
+      options: --privileged
+    steps:
+      - name: install packages
+        run: |
+          apt-get update --allow-releaseinfo-change
+          apt-get install openvpn -y
+          apt-get install openssh-client -y
+
+      - name: setup openSSH config
+        if: ${{ success() }}
+        run: |
+          cd ~
+          mkdir .ssh
+          cd .ssh/
+          echo "${{secrets.RPGPAIE_SSH_PEM}}" > RPGPAIE_SSH_PEM.pem
+          chmod 400 RPGPAIE_SSH_PEM.pem
+
+      - name: dot env creation
+        if: ${{ success() }}
+        run: |
+          cd ~
+          mkdir dotenv
+          cd dotenv/
+          echo "${{secrets.DOT_ENV_BACK}}" > .env.backend
+
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: scp dot env files
+        if: ${{ success() }}
+        run: |
+          scp -r -p -o StrictHostKeyChecking=accept-new -i ~/.ssh/RPGPAIE_SSH_PEM.pem ubuntu@51.77.213.203 ~/dotenv ubuntu@51.77.213.203:~ || echo
+
+      - name: scp bash script
+        if: ${{ success() }}
+        run: |
+          scp -r -p -o StrictHostKeyChecking=accept-new -i ~/.ssh/RPGPAIE_SSH_PEM.pem ubuntu@51.77.213.203 .github/workflows/deployPROD.sh ubuntu@51.77.213.203:~ || echo
+
+      - name: connect SSH & run deploy script
+        if: ${{ success() }}
+        run: |
+          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/RPGPAIE_SSH_PEM.pem ubuntu@51.77.213.203 /bin/bash -s << EOT
+          chmod +x ~/deployPROD.sh
+          ~/deployPROD.sh > ~/logs/rpgpaie/log.deploy.$( date +"%s") 2>&1 & disown
+          exit
+          EOT

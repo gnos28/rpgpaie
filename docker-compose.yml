@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  back:
+    build:
+      context: ./
+      dockerfile: ./backend/Dockerfile
+      target: dev
+    volumes:
+      - ./backend/src:/workdir/src
+    command: npm run start:dev
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: development
+      DEBUG: nodejs-docker-express:*
+    restart: always
+    
