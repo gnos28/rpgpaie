@@ -1,6 +1,6 @@
+import { getTokenUseCase } from "../domain/getToken/getToken.core";
+import { getTokenAdapter } from "../domain/getToken/getToken.spi";
 import { ControllerType } from "../interfaces";
-import { getTokenService } from "../services/getToken/getToken.core";
-import { getTokenAdapter } from "../services/getToken/getToken.spi";
 
 type BodyPayload = {
   client_id: string | undefined;
@@ -10,7 +10,7 @@ type BodyPayload = {
 const getSilaeTokenController: ControllerType = {
   getToken: async (_req, res) => {
     try {
-      const token = await getTokenService(getTokenAdapter.silaeRest)();
+      const token = await getTokenUseCase(getTokenAdapter.silaeRest)();
 
       res.send({ token });
     } catch (err) {
@@ -26,7 +26,7 @@ const getSilaeTokenController: ControllerType = {
       if (!client_id || !client_secret)
         throw new Error("missing credentials !");
 
-      const token = await getTokenService(getTokenAdapter.silaeRest)({
+      const token = await getTokenUseCase(getTokenAdapter.silaeRest)({
         client_id,
         client_secret,
       });
