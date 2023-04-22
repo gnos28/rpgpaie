@@ -12,7 +12,7 @@ type DossierRecupererPeriodeEnCoursResult = {
 const LISTE_DOSSIERS_URL =
   "/v1/InfosTechniquesDossiers/DossierRecupererPeriodeEnCours";
 
-export const getDossierRecupererPeriodeEnCoursR = async (
+export const getDossierRecupererPeriodeEnCours = async (
   props: DossierRecupererPeriodeEnCoursProps
 ) => {
   const body = {

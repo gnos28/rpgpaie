@@ -10,16 +10,22 @@ type SilaeRestApiProps = {
 type SilaeRestApi = <T>(props: SilaeRestApiProps) => Promise<T>;
 
 const SILAE_BASE_URL = "https://payroll-api.silae.fr/payroll/";
-let TOKEN = "";
+let token = "";
+let tokenExpirationTime = 0;
 
 export const silaeRestApi: SilaeRestApi = async (props) => {
   const subscriptionKey = process.env.SILAE_SUBSCRIPTION_KEY || "";
-  if (!TOKEN) TOKEN = (await getToken()).access_token;
+
+  if (!token || tokenExpirationTime < new Date().getTime() + 10_000) {
+    const newToken = await getToken();
+    token = newToken.access_token;
+    tokenExpirationTime = newToken.expires_on;
+  }
 
   const payload = (
     await axios.post(SILAE_BASE_URL + props.endpoint, props.body, {
       headers: {
-        Authorization: `Bearer ${TOKEN}`,
+        Authorization: `Bearer ${token}`,
         "Ocp-Apim-Subscription-Key": `${subscriptionKey}`,
         dossiers: `${props.dossier}`,
       },

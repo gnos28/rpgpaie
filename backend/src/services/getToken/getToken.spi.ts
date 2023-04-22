@@ -1,11 +1,13 @@
 import { getToken } from "../../infra/silae/getToken";
 
-type GetTokenPort = {
-  getToken: () => ReturnType<typeof getToken>;
+type GetTokenPort = () => ReturnType<typeof getToken>;
+
+type GetTokenAdapter = {
+  [key: string]: GetTokenPort;
 };
 
-const getTokenAdapter: GetTokenPort = {
-  getToken: async () => await getToken(),
+const getTokenAdapter: GetTokenAdapter = {
+  silaeRest: async () => await getToken(),
 };
 
 export { getTokenAdapter, GetTokenPort };
