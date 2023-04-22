@@ -1,8 +1,8 @@
 import { GetTokenPort } from "./getToken.spi";
 
 export type GetTokenServiceProps = {
-  clientId: string;
-  clientSecret: string;
+  client_id: string;
+  client_secret: string;
 };
 
 export const getTokenService =

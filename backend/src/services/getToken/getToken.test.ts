@@ -20,8 +20,8 @@ describe("getTokenService", () => {
   });
   test("props provided", async () => {
     const token = await getTokenService(getTokenApiMock)({
-      clientId: "azeaze",
-      clientSecret: "azeaze",
+      client_id: "azeaze",
+      client_secret: "azeaze",
     });
 
     expect(token).toBe(access_token);

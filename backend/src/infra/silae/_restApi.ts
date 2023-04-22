@@ -13,16 +13,18 @@ const SILAE_BASE_URL = "https://payroll-api.silae.fr/payroll/";
 let token = "";
 let tokenExpirationTime = 0;
 
-export const silaeRestApi: SilaeRestApi = async (props) => {
-  const subscriptionKey = process.env.SILAE_SUBSCRIPTION_KEY || "";
-
+const refreshToken = async () => {
   if (!token || tokenExpirationTime < new Date().getTime() + 10_000) {
     const newToken = await getToken();
     token = newToken.access_token;
     tokenExpirationTime = newToken.expires_on;
   }
+};
 
-  const payload = (
+const apiCall = async (props: SilaeRestApiProps) => {
+  const subscriptionKey = process.env.SILAE_SUBSCRIPTION_KEY || "";
+
+  return (
     await axios.post(SILAE_BASE_URL + props.endpoint, props.body, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -31,6 +33,12 @@ export const silaeRestApi: SilaeRestApi = async (props) => {
       },
     })
   ).data;
+};
+
+export const silaeRestApi: SilaeRestApi = async (props) => {
+  await refreshToken();
+
+  const payload = await apiCall(props);
 
   return payload;
 };

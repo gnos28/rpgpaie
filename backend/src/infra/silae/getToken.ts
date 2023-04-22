@@ -1,8 +1,8 @@
 import axios from "axios";
 
 export type GetTokenProps = {
-  clientId: string;
-  clientSecret: string;
+  client_id: string;
+  client_secret: string;
 };
 
 type GetTokenResult = {
@@ -17,8 +17,8 @@ type GetTokenResult = {
 const GET_TOKEN_URL = "https://payroll-api-auth.silae.fr/oauth2/v2.0/token";
 
 export const getToken = async (props?: GetTokenProps) => {
-  const client_id = props?.clientId || process.env.SILAE_CLIENT_ID;
-  const client_secret = props?.clientSecret || process.env.SILAE_CLIENT_SECRET;
+  const client_id = props?.client_id || process.env.SILAE_CLIENT_ID;
+  const client_secret = props?.client_secret || process.env.SILAE_CLIENT_SECRET;
 
   const tokenBody = (
     await axios.post(
