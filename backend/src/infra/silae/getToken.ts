@@ -1,6 +1,6 @@
 import axios from "axios";
 
-type GetTokenProps = {
+export type GetTokenProps = {
   clientId: string;
   clientSecret: string;
 };

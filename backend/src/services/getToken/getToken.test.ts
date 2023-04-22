@@ -13,9 +13,17 @@ const getTokenApiMock: GetTokenPort = async () => ({
 });
 
 describe("getTokenService", () => {
-  test("retrieve a token", async () => {
+  test("no props provided", async () => {
     const token = await getTokenService(getTokenApiMock)();
 
-    expect(token).toBe("token");
+    expect(token).toBe(access_token);
+  });
+  test("props provided", async () => {
+    const token = await getTokenService(getTokenApiMock)({
+      clientId: "azeaze",
+      clientSecret: "azeaze",
+    });
+
+    expect(token).toBe(access_token);
   });
 });

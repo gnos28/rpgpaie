@@ -3,6 +3,7 @@ import { getSilaeTokenController } from "../controllers/getSilaeTokenController"
 
 const router = express.Router();
 
-router.post("/", getSilaeTokenController.getToken);
+router.get("/", getSilaeTokenController.getToken);
+router.post("/", getSilaeTokenController.getTokenWithProps);
 
 export default router;
