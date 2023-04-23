@@ -1,13 +1,17 @@
 import axios from "axios";
 import { getToken } from "./getToken";
 
-type SilaeRestApiProps = {
+type Body = { [key: string]: string | number };
+
+type SilaeRestApiProps<T extends Body> = {
   endpoint: string;
-  body: { [key: string]: string | number };
+  body: T;
   dossier: string;
 };
 
-type SilaeRestApi = <T>(props: SilaeRestApiProps) => Promise<T>;
+type SilaeRestApi = <T extends Body, U>(
+  props: SilaeRestApiProps<T>
+) => Promise<U>;
 
 const SILAE_BASE_URL = "https://payroll-api.silae.fr/payroll/";
 let token = "";
@@ -21,7 +25,7 @@ const refreshToken = async () => {
   }
 };
 
-const apiCall = async (props: SilaeRestApiProps) => {
+const apiCall = async (props: SilaeRestApiProps<Body>) => {
   const subscriptionKey = process.env.SILAE_SUBSCRIPTION_KEY || "";
 
   return (
