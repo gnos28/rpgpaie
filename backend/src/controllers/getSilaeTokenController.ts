@@ -1,6 +1,6 @@
-import { getTokenUseCase } from "../domain/getToken/getToken.core";
-import { getTokenAdapter } from "../domain/getToken/getToken.spi";
-import { ControllerType } from "../interfaces";
+import { getTokenUseCase } from "../useCases/getToken/getToken.core";
+import { getTokenAdapter } from "../useCases/getToken/getToken.spi";
+import { ControllerType } from "../@types";
 
 type BodyPayload = {
   client_id: string | undefined;

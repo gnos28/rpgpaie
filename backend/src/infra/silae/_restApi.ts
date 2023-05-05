@@ -1,7 +1,9 @@
 import axios from "axios";
 import { getToken } from "./getToken";
 
-type Body = { [key: string]: string | number };
+type Body = {
+  [key: string]: string | number | string[] | number[] | undefined | Body;
+};
 
 type SilaeRestApiProps<T extends Body> = {
   endpoint: string;

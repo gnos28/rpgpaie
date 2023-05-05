@@ -1,4 +1,4 @@
-import { DateTime } from "../../interfaces";
+import { DateTime } from "../../@types";
 import { silaeRestApi } from "./_restApi";
 
 type DossierRecupererPeriodeEnCoursProps = {
@@ -13,8 +13,7 @@ type GetDossierRecupererPeriodeEnCours = (
   props: DossierRecupererPeriodeEnCoursProps
 ) => Promise<DossierRecupererPeriodeEnCoursResult>;
 
-const LISTE_DOSSIERS_URL =
-  "/v1/InfosTechniquesDossiers/DossierRecupererPeriodeEnCours";
+const ENDPOINT = "/v1/InfosTechniquesDossiers/DossierRecupererPeriodeEnCours";
 
 export const getDossierRecupererPeriodeEnCours: GetDossierRecupererPeriodeEnCours =
   async (props) => {
@@ -26,7 +25,7 @@ export const getDossierRecupererPeriodeEnCours: GetDossierRecupererPeriodeEnCour
       typeof body,
       DossierRecupererPeriodeEnCoursResult
     >({
-      endpoint: LISTE_DOSSIERS_URL,
+      endpoint: ENDPOINT,
       body,
       dossier: props.numeroDossier,
     });
