@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-// import tasks from "./tasks";
+import tasks from "./tasks";
 import * as dotenv from "dotenv";
 
 dotenv.config();
@@ -9,7 +9,7 @@ dotenv.config();
 const app = express();
 
 // CRON SCHEDULED TASK
-// tasks.initScheduledJobs();
+tasks.initScheduledJobs();
 
 app.use(cookieParser());
 
