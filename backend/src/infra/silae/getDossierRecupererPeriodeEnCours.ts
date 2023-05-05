@@ -1,7 +1,7 @@
 import { DateTime } from "../../@types";
 import { silaeRestApi } from "./_restApi";
 
-type DossierRecupererPeriodeEnCoursProps = {
+export type DossierRecupererPeriodeEnCoursProps = {
   numeroDossier: string;
 };
 

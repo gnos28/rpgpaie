@@ -3,21 +3,15 @@ import { date } from "../../infra/date";
 import { getToken } from "../../infra/silae/getToken";
 import { getDossierRecupererPeriodeEnCours } from "../../infra/silae/getDossierRecupererPeriodeEnCours";
 import { getRechercheDeclarationEvenementielle } from "../../infra/silae/getRechercheDeclarationEvenementielle";
+import { TabDataItem } from "gnos/lib/interfaces";
 
-type GetTabDataProps = { sheetId: string; tabName: string };
-
-type TabDataItem = {
-  [key: string]: string;
-} & {
-  rowIndex: number;
-  a1Range: string;
-};
+export type GetTabDataProps = { sheetId: string; tabName: string };
 
 type GetTokenResult = {
   access_token: string;
 };
 
-type DotEnv = { [key: string]: string | undefined };
+export type DotEnv = { [key: string]: string | undefined };
 
 type DotEnvKeys = "SHEET_ID";
 
@@ -42,6 +36,7 @@ export type GetDsnEvePort = {
   newDate: () => Date;
   dotenv: DotEnv | { [key in DotEnvKeys]: string | undefined };
   getTabData: (props: GetTabDataProps) => Promise<TabDataItem[]>;
+  appendToSheet: typeof sheetAPI.appendToSheet;
   getDossierRecupererPeriodeEnCours: typeof getDossierRecupererPeriodeEnCours;
   getRechercheDeclarationEvenementielle: typeof getRechercheDeclarationEvenementielle;
 };
@@ -51,6 +46,7 @@ export const getDsnEveAdapter: GetDsnEvePort = {
   newDate: () => date.new(),
   dotenv: process.env,
   getTabData: sheetAPI.getTabData,
+  appendToSheet: sheetAPI.appendToSheet,
   getDossierRecupererPeriodeEnCours: getDossierRecupererPeriodeEnCours,
   getRechercheDeclarationEvenementielle: getRechercheDeclarationEvenementielle,
 };

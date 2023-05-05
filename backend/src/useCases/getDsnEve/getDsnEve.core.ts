@@ -1,4 +1,3 @@
-import { sheetAPI } from "gnos";
 import { GetDsnEveUseCase } from "./getDsnEve.api";
 import { GetDsnEvePort } from "./getDsnEve.spi";
 import { DataRowWithId } from "gnos/lib/interfaces";
@@ -18,7 +17,7 @@ export const getDsnEveUseCase: GetDsnEveUseCase =
       tabName: "dossier",
     });
 
-    const id_dossiers = tabData.map((row) => row[ID_DOSSIER]);
+    const id_dossiers = tabData.map((row) => row[ID_DOSSIER]) as string[];
 
     const dossiersWithPeriode = await Promise.all(
       id_dossiers.map(async (numeroDossier) => ({
@@ -52,8 +51,6 @@ export const getDsnEveUseCase: GetDsnEveUseCase =
       })
     );
 
-    console.log("dossiersWithEve", dossiersWithEve);
-
     const today = adapter.newDate();
     const periode =
       today.getFullYear() + (today.getMonth() + 1).toString().padStart(2, "0");
@@ -61,9 +58,9 @@ export const getDsnEveUseCase: GetDsnEveUseCase =
     const data: DataRowWithId[] = id_dossiers
       .map((id_dossier) => {
         const filteredDossiersWithEve = dossiersWithEve
-          .filter((dossierWithEve) => {
-            dossierWithEve.numeroDossier === id_dossier;
-          })[0]
+          .filter(
+            (dossierWithEve) => dossierWithEve.numeroDossier === id_dossier
+          )[0]
           .listeDeclarationEvenementielle.filter((eve) =>
             TYPE_DECLARATION.includes(eve.typeDeclaration)
           );
@@ -87,9 +84,11 @@ export const getDsnEveUseCase: GetDsnEveUseCase =
       })
       .flat();
 
-    await sheetAPI.appendToSheet({
+    await adapter.appendToSheet({
       sheetId,
       tabName: "tableau de bord",
       data,
     });
+
+    return data;
   };

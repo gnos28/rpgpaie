@@ -10,7 +10,7 @@ type RechercheDeclarationEvenementielleBody = {
 type RechercheDeclarationEvenementielleProps =
   RechercheDeclarationEvenementielleBody;
 
-type DeclarationEvenementielle = {
+export type DeclarationEvenementielle = {
   typeDeclaration: string;
   etatDeclaration: number;
   etatEnvoi: number;
