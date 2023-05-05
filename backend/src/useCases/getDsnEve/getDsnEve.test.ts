@@ -4,18 +4,19 @@ import { DeclarationEvenementielle } from "../../infra/silae/getRechercheDeclara
 import { getDsnEveUseCase } from "./getDsnEve.core";
 import { DotEnv, GetDsnEvePort } from "./getDsnEve.spi";
 
-const event_1: DeclarationEvenementielle = {
-  typeDeclaration: "DUE",
-  etatDeclaration: 0,
-  etatEnvoi: 1,
-  libelleEtat: "string",
-  matricule: "string",
-  nomSalarie: "string",
-  dateDebut: "2023-05-05T10:00:00",
-  dateFin: "2023-05-05T10:00:00",
-  codeAbsence: "string",
-  libelleAbsence: "string",
-};
+const event = (type: "DUE" | "DN-AC-AE" | "DSIJ", etat: "OK" | "ERROR") =>
+  ({
+    typeDeclaration: type,
+    etatDeclaration: etat === "OK" ? 0 : 1,
+    etatEnvoi: 1,
+    libelleEtat: "string",
+    matricule: "string",
+    nomSalarie: "string",
+    dateDebut: "2023-05-05T10:00:00",
+    dateFin: "2023-05-05T10:00:00",
+    codeAbsence: "string",
+    libelleAbsence: "string",
+  } as DeclarationEvenementielle);
 
 describe("Feature : getDsnEve useCase", () => {
   let fixture: Fixture;
@@ -25,7 +26,7 @@ describe("Feature : getDsnEve useCase", () => {
   });
 
   describe("Rule : for a given period & given dossier_ids return for all combinations of type_declarations sum of events OK and in error in a row format ready to be appended to a google sheet", () => {
-    test("for a single dossier_id", async () => {
+    test("for a single dossier_id with 1 event", async () => {
       fixture.givenNowIs("2023-05-05");
       fixture.givenTokenIs("access_token");
       fixture.givenDotenvIs({
@@ -33,7 +34,7 @@ describe("Feature : getDsnEve useCase", () => {
       });
       fixture.givenDossierIdsAre(["1234"]);
       fixture.givenDossierPeriodeEnCoursIs("2023-05-05T10:00:00");
-      fixture.givenEvenementielFor("1234").is([event_1]);
+      fixture.givenEvenementielFor("1234").is([event("DUE", "OK")]);
       await fixture.thenThisShouldBeAppended([
         {
           id: "1234_202305_DUE",
@@ -58,6 +59,100 @@ describe("Feature : getDsnEve useCase", () => {
         },
       ]);
     });
+    test("for a single dossier_id with 2 events", async () => {
+      fixture.givenNowIs("2023-05-05");
+      fixture.givenTokenIs("access_token");
+      fixture.givenDotenvIs({
+        SHEET_ID: "SHEET_ID",
+      });
+      fixture.givenDossierIdsAre(["1234"]);
+      fixture.givenDossierPeriodeEnCoursIs("2023-05-05T10:00:00");
+      fixture
+        .givenEvenementielFor("1234")
+        .is([event("DUE", "OK"), event("DUE", "ERROR")]);
+      await fixture.thenThisShouldBeAppended([
+        {
+          id: "1234_202305_DUE",
+          id_dossier: "1234",
+          periode: "202305",
+          dsn_eve: 1,
+          erreur_dsn_eve: 1,
+        },
+        {
+          id: "1234_202305_DN-AC-AE",
+          id_dossier: "1234",
+          periode: "202305",
+          dsn_eve: 0,
+          erreur_dsn_eve: 0,
+        },
+        {
+          id: "1234_202305_DSIJ",
+          id_dossier: "1234",
+          periode: "202305",
+          dsn_eve: 0,
+          erreur_dsn_eve: 0,
+        },
+      ]);
+    });
+    test("for a multiples dossier_id with many events", async () => {
+      fixture.givenNowIs("2023-05-05");
+      fixture.givenTokenIs("access_token");
+      fixture.givenDotenvIs({
+        SHEET_ID: "SHEET_ID",
+      });
+      fixture.givenDossierIdsAre(["1234", "5678"]);
+      fixture.givenDossierPeriodeEnCoursIs("2023-05-05T10:00:00");
+      fixture
+        .givenEvenementielFor("1234")
+        .is([event("DUE", "OK"), event("DUE", "ERROR")]);
+      fixture
+        .givenEvenementielFor("5678")
+        .is([event("DSIJ", "ERROR"), event("DUE", "ERROR")]);
+      await fixture.thenThisShouldBeAppended([
+        {
+          id: "1234_202305_DUE",
+          id_dossier: "1234",
+          periode: "202305",
+          dsn_eve: 1,
+          erreur_dsn_eve: 1,
+        },
+        {
+          id: "1234_202305_DN-AC-AE",
+          id_dossier: "1234",
+          periode: "202305",
+          dsn_eve: 0,
+          erreur_dsn_eve: 0,
+        },
+        {
+          id: "1234_202305_DSIJ",
+          id_dossier: "1234",
+          periode: "202305",
+          dsn_eve: 0,
+          erreur_dsn_eve: 0,
+        },
+        {
+          id: "5678_202305_DUE",
+          id_dossier: "5678",
+          periode: "202305",
+          dsn_eve: 0,
+          erreur_dsn_eve: 1,
+        },
+        {
+          id: "5678_202305_DN-AC-AE",
+          id_dossier: "5678",
+          periode: "202305",
+          dsn_eve: 0,
+          erreur_dsn_eve: 0,
+        },
+        {
+          id: "5678_202305_DSIJ",
+          id_dossier: "5678",
+          periode: "202305",
+          dsn_eve: 0,
+          erreur_dsn_eve: 1,
+        },
+      ]);
+    });
   });
 });
 
@@ -72,6 +167,7 @@ const createFixture = () => {
   let dotenvObj: DotEnv = {};
   let dossier_ids: string[] = [];
   let periodeEnCours: DateTime | undefined = undefined;
+  let dossierEvents: DossierEvents[] = [];
 
   const newDate: GetDsnEvePort["newDate"] = () => now;
   const getToken: GetDsnEvePort["getToken"] = () =>
@@ -104,8 +200,6 @@ const createFixture = () => {
 
   const appendToSheet: GetDsnEvePort["appendToSheet"] = (_props) =>
     Promise.resolve();
-
-  let dossierEvents: DossierEvents[] = [];
 
   return {
     givenNowIs: (date: string) => {

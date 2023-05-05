@@ -8,7 +8,7 @@
     "build": "tsc --project tsconfig.build.json",
     "start:dev": "ts-node-dev src/index.ts",
     "seqtest": "cross-env NODE_ENV=test jest --passWithNoTests --testTimeout=10000 --runInBand --forceExit",
-    "test": "cross-env NODE_ENV=test jest --passWithNoTests --testTimeout=10000 --forceExit",
+    "test": "cross-env NODE_ENV=test jest --verbose --passWithNoTests --testTimeout=10000 --forceExit",
     "lint": "npx eslint 'src/**'"
   },
   "author": "",
